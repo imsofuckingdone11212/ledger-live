@@ -529,12 +529,6 @@ export const StepImportFooter = ({
           {t("common.stop")}
         </Button>
       )}
-      <InputCurrency
-        onChange={(newBalance: BigNumber) => {
-          console.log(newBalance)
-          if(mockAccount != null) mockAccount.balance = newBalance
-        } } value={BigNumber(10000)}        >
-      </InputCurrency>
 
       {isHandledError || scanStatus === "error" ? null : (
         <Button

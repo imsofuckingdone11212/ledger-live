@@ -34,6 +34,7 @@ export const SAFE_REORG_THRESHOLD = 80;
  * Get the main Account and the potential TokenAccounts linked to it
  */
 export const getAccountShape: GetAccountShape<Account> = async (infos, { blacklistedTokenIds }) => {
+  console.log("SYNC: getAccountShape")
   const { initialAccount, address, derivationMode, currency } = infos;
   const nodeApi = getNodeApi(currency);
   const [latestBlock, balance] = await Promise.all([

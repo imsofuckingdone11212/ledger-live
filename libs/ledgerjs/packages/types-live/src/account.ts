@@ -8,6 +8,7 @@ import type { OperationRaw, Operation } from "./operation";
 import type { DerivationMode } from "./derivation";
 import type { SwapOperation, SwapOperationRaw } from "./swap";
 import { ProtoNFT, ProtoNFTRaw } from "./nft";
+import { SignedOperation } from "./transaction";
 
 export type GranularityId = "HOUR" | "DAY" | "WEEK";
 

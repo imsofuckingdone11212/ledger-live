@@ -189,7 +189,7 @@ export function genOperation(
   superAccount: Account,
   account: AccountLike,
   ops: any,
-  rng: Prando,
+  rng: Prando = new Prando(),
 ): Operation {
   const ticker = account.type === "TokenAccount" ? account.token.ticker : account.currency.ticker;
   const lastOp = ops[ops.length - 1];

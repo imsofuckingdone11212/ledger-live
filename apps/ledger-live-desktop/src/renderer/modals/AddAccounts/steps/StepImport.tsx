@@ -440,7 +440,6 @@ export const StepImportFooter = ({
 
   console.log("isSandbox in import: "+sandbox)
 
-
   if(sandbox != null && scannedAccounts.length == 0){
     console.log("Generating Sandbox account...");
     const mainCurrency = currency.type === "TokenCurrency" ? currency.parentCurrency : currency;
@@ -448,7 +447,7 @@ export const StepImportFooter = ({
     console.log("AccountID splitted count: "+accountId.split(":").length)
     let mockAccount: Account = {
       type: "Account",
-      id: accountId,
+      id: accountId, 
       seedIdentifier: "mock-seed-identifier", // Replace with a unique seed identifier
       xpub: "mock-xpub", // Replace with a mock xpub if needed
       derivationMode: "", // Replace with the appropriate derivation mode
@@ -494,10 +493,28 @@ export const StepImportFooter = ({
       syncHash: "mock-sync-hash", // Replace with a mock sync hash
       nfts: [], // Add NFTs if applicable
     };
-  
+
+    // Generates mock operations for this and last 2 years
+    function genMockOperations(): Operation[]{
+      let currentDate = new Date()
+      let arr: Operation[] = []
+      let rng = new Prando()
+      for (let year = currentDate.getFullYear() - 2; year <= currentDate.getFullYear(); year++) {
+        for (let month = 0; month <= currentDate.getMonth(); month++) {
+          for (let day = 1; day < 28; day += rng.nextInt(0, 5)) { // 28 bc of february
+            let op = genOperation(mockAccount, mockAccount, arr)
+              op.date = new Date(year, month, day, rng.nextInt(0, 23), rng.nextInt(0, 59))
+              arr.push(op)
+          }
+        }
+      }
+      return arr
+    }
+    mockAccount.operations = genMockOperations()
+
     scannedAccounts.push(mockAccount)
     checkedAccountsIds.push(mockAccount.id)
-  
+
     setScanStatus("finished")
     console.log("Generated mock account:");
     console.log(mockAccount)
@@ -506,6 +523,7 @@ export const StepImportFooter = ({
   } else{
     console.log("Skipped Sandbox account generation!");
   }
+
   return (
     <>
       <Box grow>{currency && <CurrencyBadge currency={currency} />}</Box>

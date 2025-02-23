@@ -21,7 +21,7 @@ import SuccessDisplay from "~/renderer/components/SuccessDisplay";
 import Receive2NoDevice from "~/renderer/components/Receive2NoDevice";
 import { renderVerifyUnwrapped } from "~/renderer/components/DeviceAction/rendering";
 import { StepProps } from "../Body";
-import { Account, PostOnboardingActionId } from "@ledgerhq/types-live";
+import { Account, PostOnboardingActionId, isSandbox } from "@ledgerhq/types-live";
 import { track } from "~/renderer/analytics/segment";
 import Modal from "~/renderer/components/Modal";
 import Alert from "~/renderer/components/Alert";
@@ -206,7 +206,7 @@ const StepReceiveFunds = (props: StepProps) => {
   const showQRCodeModal = useCallback(() => setModalVisible(true), [setModalVisible]);
   const confirmAddress = useCallback(async () => {
     try {
-      if (getEnv("MOCK")) {
+      if (getEnv("MOCK") || isSandbox(account)) {
         setTimeout(() => {
           onChangeAddressVerified(true);
           transitionTo("receive");

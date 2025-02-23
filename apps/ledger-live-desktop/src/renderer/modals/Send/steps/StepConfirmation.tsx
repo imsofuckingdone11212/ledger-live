@@ -128,7 +128,7 @@ export function StepConfirmationFooter({
           event="Send Flow Step 4 View OpD Clicked"
           onClick={() => {
             closeModal();
-            if (account && concernedOperation) {
+            if (account && concernedOperation) {              
               setDrawer(OperationDetails, {
                 operationId: concernedOperation.id,
                 accountId: account.id,

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Trans } from "react-i18next";
 import { concat, from, Subscription } from "rxjs";
 import { ignoreElements, filter, map, retry } from "rxjs/operators";
-import { Account } from "@ledgerhq/types-live";
+import { Account, Operation } from "@ledgerhq/types-live";
 import { isAccountEmpty } from "@ledgerhq/live-common/account/index";
 import { openModal } from "~/renderer/actions/modals";
 import { DeviceShouldStayInApp, UnresponsiveDeviceError } from "@ledgerhq/errors";

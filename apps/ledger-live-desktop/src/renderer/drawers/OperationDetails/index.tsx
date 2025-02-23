@@ -22,11 +22,11 @@ import {
 } from "@ledgerhq/live-common/operation";
 import { getEnv } from "@ledgerhq/live-env";
 import { CryptoCurrencyId } from "@ledgerhq/types-cryptoassets";
-import { Account, AccountLike, NFTMetadata, Operation, OperationType } from "@ledgerhq/types-live";
+import { Account, AccountLike, NFTMetadata, Operation, OperationType, isSandbox } from "@ledgerhq/types-live";
 import { TFunction } from "i18next";
 import invariant from "invariant";
 import uniq from "lodash/uniq";
-import React, { Component, useCallback, useMemo } from "react";
+import React, { Component, useCallback, useMemo, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { connect, useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
@@ -80,6 +80,8 @@ import {
 import { dayAndHourFormat, useDateFormatted } from "~/renderer/hooks/useDateFormatter";
 import { useAccountUnit } from "~/renderer/hooks/useAccountUnit";
 import { useAccountName } from "~/renderer/reducers/wallet";
+import { Input } from "@ledgerhq/react-ui";
+import BigNumber from "bignumber.js";
 
 const mapStateToProps = (
   state: State,
@@ -280,6 +282,11 @@ const OperationD = (props: Props) => {
   const isStuck = isStuckOperation({ family: mainAccount.currency.family, operation });
   const feesCurrency = useMemo(() => getFeesCurrency(mainAccount), [mainAccount]);
   const feesUnit = useMemo(() => getFeesUnit(feesCurrency), [feesCurrency]);
+
+  const [opValue, setOpValue] = useState(operation.value)
+  const [transId, setTransId] = useState(operation.hash)
+  const [from, setFrom] = useState(operation.senders[0])
+  const [to, setTo] = useState(operation.recipients[0])
 
   return (
     <Box flow={3} px={20} mt={20}>
@@ -691,6 +698,39 @@ const OperationD = (props: Props) => {
         <OpDetailsExtra operation={operation} type={type} account={account as Account} />
       )}
       <B />
+      
+      {"Operation Value: "}
+      <Input type="text" value={opValue} onChange={(val: any)=> {
+        console.log(val)
+        operation.value = new BigNumber(val)
+        setOpValue(new BigNumber(val))
+      }}>
+      </Input>
+
+      {"Transaction ID / Operation Hash: "}
+      <Input type="text" value={transId} onChange={(val: any)=> {
+        console.log(val)
+        operation.hash = val as string
+        setTransId(val)
+      }}>
+      </Input>
+
+      {"FROM: "}
+      <Input type="text" value={from} onChange={(val: any)=> {
+        console.log(val)
+        operation.senders[0] = val as string
+        setFrom(val)
+      }}>
+      </Input>
+
+      {"TO: "}
+      <Input type="text" value={to} onChange={(val: any)=> {
+        console.log(val)
+        operation.recipients[0] = val as string
+        setTo(val)
+      }}>
+      </Input>
+
     </Box>
   );
 };

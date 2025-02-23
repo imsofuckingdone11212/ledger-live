@@ -82,7 +82,6 @@ export function genMockSignedSend(account: Account, transaction: Transaction,
 }
 
 let operationAdded = false
-let operationAdded = false
 export default function StepConnectDevice({
   account,
   parentAccount,

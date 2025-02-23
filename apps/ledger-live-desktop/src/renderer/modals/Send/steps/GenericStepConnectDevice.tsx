@@ -16,6 +16,7 @@ import { mevProtectionSelector } from "~/renderer/reducers/settings";
 import connectApp from "@ledgerhq/live-common/hw/connectApp";
 import BigNumber from "bignumber.js";
 import { DeviceModelId } from "@ledgerhq/devices";
+import Prando from "prando";
 const action = createAction(getEnv("MOCK") ? mockedEventEmitter : connectApp);
 const Result = (
   props:
@@ -35,12 +36,59 @@ const Result = (
     </StepProgress>
   );
 };
+export function genMockSignedSend(account: Account, transaction: Transaction, 
+  status: TransactionStatus, maybeRecipient: string){
+  function genHex(length: number, rng: Prando): string {
+    return rng.nextString(length, "0123456789ABCDEF");
+  }
+
+  let rng = new Prando()
+  let acc = account as Account;
+  const transactionSequenceNumber = rng.nextInt()
+  const date = new Date()
+  const blockHeight = acc.blockHeight -
+  // FIXME: always the same, valueOf for arithmetics operation on date in typescript
+  Math.floor((Date.now().valueOf() - date.valueOf()) / 900000);
+  const recipients = maybeRecipient ? [maybeRecipient] : []
+
+  let operation : SignedOperation = {
+    operation: {
+      id: String(`mock_op_${account.operations.length}_OUT_${account.id}`),
+      hash: genHex(64, rng),
+      type: "OUT",
+      value: transaction.amount,
+      fee: status.estimatedFees,
+      senders: [account.id],
+      recipients,
+      blockHeight,
+      blockHash: genHex(64, rng),
+      transactionSequenceNumber,
+      accountId: account.id,
+      standard: undefined,
+      operator: undefined,
+      contract: undefined,
+      tokenId: undefined,
+      date,
+      hasFailed: false,
+      subOperations: [],
+      internalOperations: [],
+      nftOperations: [],
+      transactionRaw: undefined,
+      extra: undefined
+    },
+    signature: ""
+  } 
+  return operation
+}
+
+let operationAdded = false
 let operationAdded = false
 export default function StepConnectDevice({
   account,
   parentAccount,
   transaction,
   status,
+  maybeRecipient,
   transitionTo,
   onOperationBroadcasted,
   onTransactionError,
@@ -53,6 +101,7 @@ export default function StepConnectDevice({
   parentAccount?: Account | undefined | null;
   transaction?: Transaction | undefined | null;
   status: TransactionStatus;
+  maybeRecipient: string;
   onTransactionError: (a: Error) => void;
   onOperationBroadcasted: (a: Operation) => void;
   setSigned: (a: boolean) => void;
@@ -88,39 +137,16 @@ export default function StepConnectDevice({
         operation => {
           if(operationAdded) return
           if(account && isSandbox(account)){
-            
-            const transactionSequenceNumber = 0
-            const blockHash = ""; const blockHeight = 0; const date = new Date();
-            let op = {
-              ...operation,
-              transactionSequenceNumber, // Mock
-              blockHash, // Mock
-              blockHeight, // Mock
-              date, // Mock
-              subOperations: operation.subOperations?.map(subOp => ({
-                ...subOp,
-                transactionSequenceNumber,
-                blockHash, // Mock
-                blockHeight, // Mock
-                date, // Mock
-              })),
-              nftOperations: operation.nftOperations?.map(nftOp => ({
-                ...nftOp,
-                transactionSequenceNumber,
-                blockHash, // Mock
-                blockHeight, // Mock
-                date, // Mock
-              })),
-            } as Operation;
-
-          account?.operations.push(op)
-          account?.pendingOperations.push(op)
+          account.operations.push(operation);
+          account.operationsCount++;
+          //account?.operations.push(operation)
+          //account?.pendingOperations.push(operation)
           operationAdded = true
-          console.log(op)
+          console.log(operation)
           console.log("OPERATIONS: ")
           console.log(account?.operations)
-          console.log("PENDING OPERATIONS: ")
-          console.log(account?.pendingOperations)
+          //console.log("PENDING OPERATIONS: ")
+          //console.log(account?.pendingOperations)
           }
 
           if (!onConfirmationHandler) {
@@ -156,33 +182,8 @@ export default function StepConnectDevice({
   }
 
   if(isSandbox(account)){
-    let operation : SignedOperation = {
-      operation: {
-        id: "42",
-        hash: "",
-        type: "OUT",
-        value: transaction.amount,
-        fee: status.estimatedFees,
-        senders: [account.id],
-        recipients: [],
-        blockHeight: undefined,
-        blockHash: undefined,
-        transactionSequenceNumber: undefined,
-        accountId: "",
-        standard: undefined,
-        operator: undefined,
-        contract: undefined,
-        tokenId: undefined,
-        date: new Date(),
-        hasFailed: false,
-        subOperations: [],
-        internalOperations: [],
-        nftOperations: [],
-        transactionRaw: undefined,
-        extra: undefined
-      },
-      signature: ""
-    } 
+    let operation = genMockSignedSend(account as Account, transaction, status, maybeRecipient)
+
     const mockResult: {
       signedOperation?: SignedOperation | undefined | null;
       device: Device;

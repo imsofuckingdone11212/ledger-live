@@ -7,6 +7,7 @@ export default function StepConnectDevice({
   parentAccount,
   transaction,
   status,
+  maybeRecipient,
   transitionTo,
   onOperationBroadcasted,
   onTransactionError,

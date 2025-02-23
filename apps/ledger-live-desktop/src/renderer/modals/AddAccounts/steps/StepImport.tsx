@@ -33,6 +33,10 @@ import { getDefaultAccountName } from "@ledgerhq/live-wallet/accountName";
 import BigNumber from "bignumber.js";
 import InputCurrency from "~/renderer/components/InputCurrency";
 import RequestAmount from "~/renderer/components/RequestAmount";
+import Prando from "prando";
+import { genMockSignedSend } from "../../Send/steps/GenericStepConnectDevice";
+import { Transaction, TransactionStatus } from "@ledgerhq/live-common/generated/types";
+import {genOperation} from "@ledgerhq/coin-framework/mocks/account"
 
 type Props = AccountListProps & {
   defaultSelected: boolean;
